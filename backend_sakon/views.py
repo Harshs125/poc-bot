@@ -96,19 +96,22 @@ class Configuration(APIView):
         
     def put(self, request, config_id, *args, **kwargs):
         try:
-            configuration = Configurations.objects.get(config_id=config_id)
             # update the configuration fields
-            configuration.config_name = request.data.get('config_name', configuration.config_name)
-            configuration.dept_name = request.data.get('dept-name', configuration.dept_name)
-            configuration.email = request.data.get('email', configuration.email)
-            configuration.sftp_login = request.data.get('sftp-login', configuration.sftp_login)
-            configuration.sftp_password = request.data.get('sftp-password', configuration.sftp_password)
-            configuration.sftp_path = request.data.get('sftp-path', configuration.sftp_path)
-            configuration.carrier_name = request.data.get('carrier-name', configuration.carrier_name)
-            configuration.website_url = request.data.get('website-url', configuration.website_url)
-            configuration.template = request.data.get('template', configuration.template)
-            configuration.is_scheduled = request.data.get('is_scheduled', configuration.is_scheduled)
-            configuration.save()
+            configuration = Configurations.objects.get(config_id=config_id)
+            configuration.update(
+                config_name=request.data.get('config_name', configuration.config_name),
+                dept_name=request.data.get('dept-name', configuration.dept_name),
+                email=request.data.get('email', configuration.email),
+                sftp_login=request.data.get('sftp-login', configuration.sftp_login),
+                sftp_password=request.data.get('sftp-password', configuration.sftp_password),
+                sftp_path=request.data.get('sftp-path', configuration.sftp_path),
+                carrier_name=request.data.get('carrier-name', configuration.carrier_name),
+                website_url=request.data.get('website-url', configuration.website_url),
+                template=request.data.get('template', configuration.template),
+                is_scheduled=request.data.get('is_scheduled', configuration.is_scheduled)
+            )
+            
+        
             data = {
                 'config_id': configuration.config_id,
                 'config_name': configuration.config_name,
@@ -168,38 +171,31 @@ class Schedule(APIView):
         try:
             data = json.loads(request.body) 
             emp = data.get('emp_id') 
-            config = data.get('config_id') 
+            configs = data.get('config_id') 
             schedule_name=data.get('schedule_name') 
-            frequency = data.get('frequency') 
+            interval = data.get('interval') 
             time = data.get('time') 
             days_of_week = data.get('days_of_week', None) 
             day_of_month = data.get('day_of_month', None) 
             timezone = data.get('timezone', 'UTC') 
-
-        
-            schedule = Schedules.objects.create( 
+            for config in configs:
+                schedule = Schedules.objects.create( 
                 emp_id=emp, 
                 config_id=config, 
                 schedule_name=schedule_name, 
-                frequency=frequency, 
+                frequency=interval, 
                 time=time, 
                 days_of_week=days_of_week, 
                 day_of_month=day_of_month, 
                 timezone=timezone 
-             
-            ) 
-            schedule.save() 
-            config=Configurations.objects.get(config_id=config)
-            config.is_scheduled = True
-            config.save()
+                ) 
+                schedule.save() 
+                config=Configurations.objects.get(config_id=config)
+                config.is_scheduled = True
+                config.save()
             return JsonResponse({'success': True}) 
         except Exception as e:
             return JsonResponse({'error': str(e)}) 
-        
-    
- 
- 
-
  
     def put(self, request, *args, **kwargs): 
         try:
@@ -213,24 +209,14 @@ class Schedule(APIView):
          
          
             data = json.loads(request.body) 
-            emp = data.get('emp_id', schedule.emp_id) 
-            config = data.get('config_id', schedule.config_id) 
-            schedule_name = data.get('schedule_name', schedule.schedule_name) 
-            frequency = data.get('frequency', schedule.frequency) 
-            time = data.get('time', schedule.time) 
-            days_of_week = data.get('days_of_week', schedule.days_of_week) 
-            day_of_month = data.get('day_of_month', schedule.day_of_month) 
-            timezone = data.get('timezone', schedule.timezone) 
-          
-            schedule.emp_id = emp 
-            schedule.config_id = config 
-            schedule.schedule_name = schedule_name 
-            schedule.frequency = frequency 
-            schedule.time = time 
-            schedule.days_of_week = days_of_week 
-            schedule.day_of_month = day_of_month 
-            schedule.timezone = timezone 
-            schedule.save() 
+            schedule.update(
+                emp_id=data.get('emp_id', schedule.emp_id) ,
+                schedule_name=data.get('schedule_name', schedule.schedule_name),
+                config_id=data.get('config_id', schedule.config_id),
+                frequency=data.get('frequency', schedule.frequency),
+                days_of_week=data.get('days_of_week', schedule.days_of_week),
+                day_of_month=data.get('day_of_month', schedule.day_of_month),
+                time=data.get('timezone', schedule.timezone))
             return JsonResponse({'success': True})     
         except Exception as e:
             return JsonResponse({'error': str(e)})
