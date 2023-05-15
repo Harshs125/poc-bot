@@ -8,6 +8,7 @@ class SuperAdmin(models.Model):
     created_at=models.DateTimeField(auto_now_add=True) 
     updated_at=models.DateTimeField(auto_now=True) 
  
+
 class Organization(models.Model): 
     name=models.CharField(null=False,max_length=250,unique=True) 
     created_at=models.DateTimeField(auto_now_add=True) 
@@ -67,6 +68,7 @@ class Configuration(models.Model):
         created_at=models.DateTimeField(auto_now_add=True) 
         updated_at=models.DateTimeField(auto_now=True) 
  
+
 class FileMetaData(models.Model): 
     name=models.CharField(max_length=250,null=False,unique=True) 
     size=models.IntegerField(null=False) 
@@ -77,25 +79,27 @@ class FileMetaData(models.Model):
     created_at=models.DateTimeField(auto_now_add=True) 
     updated_at=models.DateTimeField(auto_now=True) 
  
+
 class Schedule(models.Model): 
     name=models.CharField(max_length=250,null=False,unique=True)
     config=models.ForeignKey(Configuration,on_delete=models.CASCADE,null=True) 
     emp=models.ForeignKey(Employee,on_delete=models.CASCADE,null=True) 
     TASK_FREQUENCY_CHOICES = [ 
-        ('1', 'Daily'), 
-        ('2', 'Weekly'), 
-        ('3', 'Monthly'), 
+        (1,'Daily'), 
+        (2,'Weekly'), 
+        (3,'Monthly')
     ] 
-    frequency = models.CharField(max_length=10, choices=TASK_FREQUENCY_CHOICES) 
-    time = models.TimeField() 
-    days_of_week = models.CharField(max_length=50, blank=True, null=True) 
-    day_of_month = models.DateField(blank=True, null=True) 
+    frequency=models.CharField(max_length=10, choices=TASK_FREQUENCY_CHOICES) 
+    time=models.TimeField() 
+    days_of_week=models.CharField(max_length=50, blank=True, null=True) 
+    day_of_month=models.DateField(blank=True, null=True) 
     timezone=models.CharField(max_length=50,default='UTC')
     created_at=models.DateTimeField(auto_now_add=True) 
     updated_at=models.DateTimeField(auto_now=True) 
 
+
 class Carrier(models.Model):
     name=models.CharField(max_length=250,null=False,unique=True)
-    url=models.CharField(max_length=500,null=False)
+    website_url=models.URLField()
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
