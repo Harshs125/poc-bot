@@ -62,13 +62,13 @@ class Schedule(models.Model):
     configurations = models.JSONField()
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
     TASK_FREQUENCY_CHOICES = [
-        ("Daily", "Daily"),
-        ("Weekly", "Weekly"),
-        ("Monthly", "Monthly"),
+        ("DAILY", "DAILY"),
+        ("WEEKLY", "WEEKLY"),
+        ("MONTHLY", "MONTHLY"),
     ]
     interval = models.CharField(max_length=10, choices=TASK_FREQUENCY_CHOICES)
     time = models.TimeField()
-    weekDay = models.CharField(max_length=250, null=False)
+    weekDay = models.CharField(max_length=250, null=True)
     monthDay = models.IntegerField(null=True)
     timeZone = models.CharField(max_length=50, default="UTC")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -76,7 +76,7 @@ class Schedule(models.Model):
 
 
 class Configuration(models.Model):
-    name = models.CharField(null=False, max_length=250)
+    name = models.CharField(null=False, max_length=250, unique=True)
     dept_name = models.CharField(null=False, max_length=250)
     email = models.EmailField(null=False)
     password = models.CharField(max_length=250, null=False)

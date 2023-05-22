@@ -40,7 +40,6 @@ class EmployeesAPI(APIView):
         serializer = EmployeesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            print(serializer.data)
             return JsonResponse(
                 {"message": "successfully entered data in db"}, status=200
             )
