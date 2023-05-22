@@ -88,7 +88,7 @@ class Configuration(models.Model):
     website_url = models.URLField()
     template = models.FileField(upload_to="files/")
     is_scheduled = models.BooleanField(default=False)
-    schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

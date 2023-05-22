@@ -4,8 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
-from django.core.paginator import Paginator
-from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
+from rest_framework.pagination import PageNumberPagination
 from .serializers import (
     ConfigurationSerializer,
     SchedulerSerializer,
@@ -13,9 +12,6 @@ from .serializers import (
     OragnizationSerializer,
 )
 from .models import Organization, Employee, Configuration, Schedule
-import json
-from django.db.models import Count
-from collections import defaultdict
 
 
 class EmployeesAPI(APIView):
@@ -27,8 +23,18 @@ class EmployeesAPI(APIView):
             serializer = EmployeesSerializer(employees)
         else:
             employees = Employee.objects.all()
-            serializer = EmployeesSerializer(employees, many=True)
-        return JsonResponse({"data": serializer.data}, status=200)
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(employees, request)
+            serializer = EmployeesSerializer(result_page, many=True)
+        return JsonResponse(
+            {
+                "count": paginator.page.paginator.count,
+                "previous": paginator.get_previous_link(),
+                "next": paginator.get_next_link(),
+                "data": serializer.data,
+            },
+            status=200,
+        )
 
     def post(self, request):
         serializer = EmployeesSerializer(data=request.data)
@@ -43,14 +49,26 @@ class EmployeesAPI(APIView):
 
 
 class OrganizationAPI(APIView):
+    pagination_class = PageNumberPagination
+
     def get(self, request, id=None):
         if id is not None:
             organization = Organization.objects.get(id=id)
             serializer = OragnizationSerializer(organization)
         else:
             organization = Organization.objects.all()
-            serializer = OragnizationSerializer(organization, many=True)
-        return JsonResponse({"data": serializer.data}, status=200)
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(organization, request)
+            serializer = OragnizationSerializer(result_page, many=True)
+        return JsonResponse(
+            {
+                "count": paginator.page.paginator.count,
+                "previous": paginator.get_previous_link(),
+                "next": paginator.get_next_link(),
+                "data": serializer.data,
+            },
+            status=200,
+        )
 
     def post(self, request):
         serializer = EmployeesSerializer(data=request.data)
@@ -64,6 +82,7 @@ class OrganizationAPI(APIView):
 
 
 class ConfigurationAPI(APIView):
+    pagination_class = PageNumberPagination
     queryset = Configuration.objects.all()
     serializer_class = ConfigurationSerializer
 
@@ -78,21 +97,31 @@ class ConfigurationAPI(APIView):
                 Q(dept_name=dept_name) if dept_name else Q(),
                 Q(is_scheduled=is_scheduled) if is_scheduled is not None else Q(),
             )
-            serializer = ConfigurationSerializer(configurations, many=True)
-            data = [
-                {
-                    "id": configuration.id,
-                    "ConfigurationName": configuration.name,
-                    "department": configuration.dept_name,
-                    "emp": configuration.emp.id,
-                    "email": configuration.email,
-                    "carrierName": configuration.carrier,
-                    "schedulingStatus": configuration.is_scheduled,
-                }
-                for configuration in configurations
-            ]
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(configurations, request)
+            serializer = ConfigurationSerializer(result_page, many=True)
+            response_data = []
+            for d in serializer.data:
+                response_data.append(
+                    {
+                        "id": d.get("id"),
+                        "ConfigurationName": d.get("name"),
+                        "department": d.get("dept_name"),
+                        "emp": d.get("emp"),
+                        "email": d.get("email"),
+                        "carrierName": d.get("carrier"),
+                        "schedulingStatus": d.get("is_scheduled"),
+                        "scheduler_id": d.get("schedule"),
+                    }
+                )
             return JsonResponse(
-                {"configurations": data, "total_rows": configurations.count()}
+                {
+                    "count": paginator.page.paginator.count,
+                    "previous": paginator.get_previous_link(),
+                    "next": paginator.get_next_link(),
+                    "data": response_data,
+                },
+                status=200,
             )
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
@@ -130,6 +159,7 @@ class ConfigurationAPI(APIView):
 class ScheduleAPI(APIView):
     queryset = Schedule.objects.all()
     serializer_class = SchedulerSerializer
+    pagination_class = PageNumberPagination
 
     def get_serializer(self, *args, **kwargs):
         return SchedulerSerializer(*args, **kwargs)
@@ -140,10 +170,12 @@ class ScheduleAPI(APIView):
             config = request.query_params.get("config_id")
             schedules = Schedule.objects.filter(
                 Q(emp=emp) if emp else Q(),
-                Q(configurations__exact=[config]) if config else Q(),
+                Q(configurations__icontains=config) if config else Q(),
             )
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(schedules, request)
             data = []
-            for schedule in schedules:
+            for schedule in result_page:
                 configurations = Configuration.objects.filter(
                     id__in=schedule.configurations
                 ).values_list("name", flat=True)
@@ -171,8 +203,15 @@ class ScheduleAPI(APIView):
                             "updated_at": schedule.updated_at,
                         }
                     )
-
-            return JsonResponse({"schedules": data})
+            return JsonResponse(
+                {
+                    "count": paginator.page.paginator.count,
+                    "previous": paginator.get_previous_link(),
+                    "next": paginator.get_next_link(),
+                    "data": data,
+                },
+                status=200,
+            )
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 

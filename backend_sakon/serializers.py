@@ -17,6 +17,8 @@ class ConfigurationSerializer(serializers.ModelSerializer):
             "template",
             "sftp_path",
             "emp",
+            "is_scheduled",
+            "schedule",
         )
 
     def create(self, validated_data):
