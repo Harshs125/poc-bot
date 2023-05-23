@@ -123,7 +123,7 @@ class ConfigurationAPI(APIView):
                 status=200,
             )
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+            return JsonResponse({"error": "Internal Server Error"}, status=400)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -140,7 +140,7 @@ class ConfigurationAPI(APIView):
             else:
                 return JsonResponse({"error": serializer.errors}, status=400)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+            return JsonResponse({"error": "Internal Server Error"}, status=400)
 
     def put(self, request, id, *args, **kwargs):
         try:
@@ -212,7 +212,7 @@ class ScheduleAPI(APIView):
                 status=200,
             )
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+            return JsonResponse({"error": "Internal Server Error"}, status=400)
 
     def post(self, request):
         try:
@@ -247,7 +247,7 @@ class ScheduleAPI(APIView):
             else:
                 return JsonResponse({"error": serializer.errors}, status=400)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+            return JsonResponse({"error": "Internal Server Error"}, status=400)
 
     def put(self, request, id, *args, **kwargs):
         try:
