@@ -67,7 +67,7 @@ class Schedule(models.Model):
         ("MONTHLY", "MONTHLY"),
     ]
     interval = models.CharField(max_length=10, choices=TASK_FREQUENCY_CHOICES)
-    time = models.TimeField()
+    timeDuration = models.TimeField()
     weekDay = models.CharField(max_length=250, null=True)
     monthDay = models.IntegerField(null=True)
     timeZone = models.CharField(max_length=50, default="UTC")

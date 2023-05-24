@@ -33,7 +33,7 @@ class SchedulerSerializer(serializers.ModelSerializer):
             "id",
             "schedularName",
             "interval",
-            "time",
+            "timeDuration",
             "weekDay",
             "monthDay",
             "timeZone",
@@ -49,7 +49,9 @@ class SchedulerSerializer(serializers.ModelSerializer):
             "schedularName", instance.schedularName
         )
         instance.interval = validated_data.get("interval", instance.interval)
-        instance.time = validated_data.get("time", instance.time)
+        instance.timeDuration = validated_data.get(
+            "timeDuration", instance.timeDuration
+        )
         instance.weekDay = validated_data.get("weekDay", instance.weekDay)
         instance.monthDay = validated_data.get("monthDay", instance.monthDay)
         instance.timeZone = validated_data.get("timeZone", instance.timeZone)
