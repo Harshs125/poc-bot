@@ -10,8 +10,9 @@ from .serializers import (
     SchedulerSerializer,
     EmployeesSerializer,
     OragnizationSerializer,
+    DepartmentSerialzer
 )
-from .models import Organization, Employee, Configuration, Schedule
+from .models import Organization, Employee, Configuration, Schedule,Department
 
 
 class EmployeesAPI(APIView):
@@ -260,3 +261,13 @@ class ScheduleAPI(APIView):
             return Response({"message": "Scheduler updated successfully"}, status=200)
         else:
             return JsonResponse({"error": "Internal Server Error"}, status=400)
+
+
+class departmentAPI(APIView):
+    def get(self,request):
+        try:
+            departments=Department.objects.all()
+            seriallizer=DepartmentSerialzer(departments,many=True)
+            return JsonResponse({"data":seriallizer.data},status=200)
+        except Exception as e:
+            return JsonResponse({"error":"internal server error"},status=400)
