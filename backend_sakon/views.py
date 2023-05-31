@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,33 +11,16 @@ from .serializers import (
     SchedulerSerializer,
     EmployeesSerializer,
     OragnizationSerializer,
-    DepartmentSerialzer
+    DepartmentSerialzer,
 )
-from .models import Organization, Employee, Configuration, Schedule,Department
+from .models import Organization, Employee, Configuration, Schedule, Department
 
 
-class EmployeesAPI(APIView):
-    pagination_class = PageNumberPagination
-
-    def get(self, request, id=None):
-        if id is not None:
-            employees = Employee.objects.get(id=id)
-            serializer = EmployeesSerializer(employees)
-        else:
-            employees = Employee.objects.all()
-            paginator = self.pagination_class()
-            result_page = paginator.paginate_queryset(employees, request)
-            serializer = EmployeesSerializer(result_page, many=True)
-        return JsonResponse(
-            {
-                "count": paginator.page.paginator.count,
-                "previous": paginator.get_previous_link(),
-                "next": paginator.get_next_link(),
-                "data": serializer.data,
-            },
-            status=200,
-        )
-
+class EmployeesAPI(generics.ListAPIView):
+    queryset=Employee.objects.all()
+    serializer_class=EmployeesSerializer
+    pagination_class=PageNumberPagination
+    
     def post(self, request):
         serializer = EmployeesSerializer(data=request.data)
         if serializer.is_valid():
@@ -48,30 +32,19 @@ class EmployeesAPI(APIView):
             return JsonResponse({"error": "Internal Server Error"}, status=400)
 
 
-class OrganizationAPI(APIView):
-    pagination_class = PageNumberPagination
+class OrganizationAPI(generics.ListAPIView):
+    queryset=Organization.objects.all()
+    serializer_class=OragnizationSerializer
+    pagination_class=PageNumberPagination
 
-    def get(self, request, id=None):
-        if id is not None:
-            organization = Organization.objects.get(id=id)
-            serializer = OragnizationSerializer(organization)
-        else:
-            organization = Organization.objects.all()
-            paginator = self.pagination_class()
-            result_page = paginator.paginate_queryset(organization, request)
-            serializer = OragnizationSerializer(result_page, many=True)
-        return JsonResponse(
-            {
-                "count": paginator.page.paginator.count,
-                "previous": paginator.get_previous_link(),
-                "next": paginator.get_next_link(),
-                "data": serializer.data,
-            },
-            status=200,
-        )
+    def get_queryset(self):
+        org_id = self.kwargs.get('id')
+        if org_id:
+            return Organization.objects.filter(id=org_id)
+        return Organization.objects.all()
 
-    def post(self, request):
-        serializer = EmployeesSerializer(data=request.data)
+    def post(self, request):    
+        serializer = OragnizationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(
@@ -187,15 +160,8 @@ class ScheduleAPI(APIView):
                             "schedule_name": schedule.schedularName,
                             "emp": schedule.emp.id,
                             "configuration": configuration_names,
-                            "interval": str(
-                                schedule.interval
-                                + " "
-                                + schedule.weekDay
-                                + " "
-                                + "at "
-                                + str(schedule.time)
-                            ),
-                            "time": schedule.time,
+                            "interval": f"{schedule.interval} {schedule.weekDay if schedule.weekDay is not None else ''} at {schedule.timeDuration if schedule.timeDuration is not None else ''}",
+                            "time": schedule.timeDuration,
                             "weekDay": schedule.weekDay,
                             "monthDay": schedule.monthDay,
                             "timeZone": str(schedule.timeZone),
@@ -213,7 +179,7 @@ class ScheduleAPI(APIView):
                 status=200,
             )
         except Exception as e:
-            return JsonResponse({"error": "Internal Server Error"}, status=400)
+            return JsonResponse({"error": str(e)}, status=400)
 
     def post(self, request):
         try:
@@ -263,11 +229,9 @@ class ScheduleAPI(APIView):
             return JsonResponse({"error": "Internal Server Error"}, status=400)
 
 
-class departmentAPI(APIView):
-    def get(self,request):
-        try:
-            departments=Department.objects.all()
-            seriallizer=DepartmentSerialzer(departments,many=True)
-            return JsonResponse({"data":seriallizer.data},status=200)
-        except Exception as e:
-            return JsonResponse({"error":"internal server error"},status=400)
+class DepartmentAPI(generics.ListAPIView):
+    queryset=Department.objects.all()
+    serializer_class=DepartmentSerialzer
+    pagination_class=PageNumberPagination
+
+   

@@ -18,5 +18,5 @@ urlpatterns = [
     ),
     path("schedules", views.ScheduleAPI.as_view(), name="schedules"),
     path("schedules/<int:id>", views.ScheduleAPI.as_view(), name="schedules_update"),
-    path("departments",views.departmentAPI.as_view(),name="departments")
+    path("departments", views.DepartmentAPI.as_view(), name="departments"),
 ]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Configuration, Employee, Schedule, Organization,Department
+from .models import Configuration, Employee, Schedule, Organization, Department
 
 
 class ConfigurationSerializer(serializers.ModelSerializer):
@@ -85,9 +85,5 @@ class OragnizationSerializer(serializers.ModelSerializer):
 
 class DepartmentSerialzer(serializers.ModelSerializer):
     class Meta:
-        model=Department
-        fields=(
-            "id",
-            "name",
-            "org"
-        )
+        model = Department
+        fields = ("id", "name", "org")
