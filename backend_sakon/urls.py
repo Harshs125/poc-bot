@@ -18,7 +18,4 @@ urlpatterns = [
     ),
     path("schedules", views.ScheduleAPI.as_view(), name="schedules"),
     path("schedules/<int:id>", views.ScheduleAPI.as_view(), name="schedules_update"),
-    path("add_to_queue/<int:id>", views.add_schedule_to_queue, name="add_to_queue"),
-    path("run_thread", views.run_thread, name="run_thread"),
-    # path("download_file", views.download_file_script, name="download_file_script"),
 ]

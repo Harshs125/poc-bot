@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Configuration, Employee, Schedule, Organization
+from .models import Configuration, Employee, Schedule, Organization, Department
 
 
 class ConfigurationSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class SchedulerSerializer(serializers.ModelSerializer):
             "id",
             "schedularName",
             "interval",
-            "time",
+            "timeDuration",
             "weekDay",
             "monthDay",
             "timeZone",
@@ -49,7 +49,9 @@ class SchedulerSerializer(serializers.ModelSerializer):
             "schedularName", instance.schedularName
         )
         instance.interval = validated_data.get("interval", instance.interval)
-        instance.time = validated_data.get("time", instance.time)
+        instance.timeDuration = validated_data.get(
+            "timeDuration", instance.timeDuration
+        )
         instance.weekDay = validated_data.get("weekDay", instance.weekDay)
         instance.monthDay = validated_data.get("monthDay", instance.monthDay)
         instance.timeZone = validated_data.get("timeZone", instance.timeZone)
@@ -79,3 +81,9 @@ class OragnizationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Organization.objects.create(**validated_data)
+
+
+class DepartmentSerialzer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = ("id", "name", "org")
