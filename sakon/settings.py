@@ -11,9 +11,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR_FRONTEND = r"C:\Users\adity\OneDrive\Desktop"
+REACT_APP_DIR = os.path.join(BASE_DIR_FRONTEND, 'SAKON_POC_FRONTEND', 'sakon-poc-frontend (copy)', 'build', 'static')
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -105,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 100
 }
 
 
@@ -130,3 +134,14 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# settings.py
+# Add the React app's build directory to the list of static file directories
+STATICFILES_DIRS = [
+    REACT_APP_DIR,
+]
+
+# Configure the static files settings
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

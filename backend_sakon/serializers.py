@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Configuration, Employee, Schedule, Organization, Department
+from .models import Configuration, Employee, Schedule, Organization, Department, Jobs,DownloadReport,FileValidationReport,TemplateValidationReport,UploadReport
 
 
 class ConfigurationSerializer(serializers.ModelSerializer):
@@ -87,3 +87,78 @@ class DepartmentSerialzer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = ("id", "name", "org")
+
+
+class JobsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Jobs
+        fields = (
+            "id",
+            "department_name",
+            "service",
+            "status",
+            "Triggered_At",
+            "configuration",
+            "schedule",
+        )
+
+    def create(self, validated_data):
+        return Jobs.objects.create(**validated_data)
+
+class DownloadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=DownloadReport
+        fields=(
+            "id",
+            "job",
+            "status",
+            "description",
+            "attempts",
+            "Triggered_At"
+        )
+    
+    def create(self,validated_data):
+        return DownloadReport.objects.create(**validated_data)
+
+class FileValidatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=FileValidationReport
+        fields=(
+            "id",
+            "job",
+            "status",
+            "description",
+            "attempts",
+            "Triggered_At"
+        )
+    def create(self,validated_data):
+        return FileValidationReport.objects.create(**validated_data)
+
+class UploadValidatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=UploadReport
+        fields=(
+            "id",
+            "job",
+            "status",
+            "description",
+            "attempts",
+            "Triggered_At"
+        )
+    def create(self,validated_data):
+        return UploadReport.objects.create(**validated_data)
+    
+class TemplateValidatorSerializer(serializers.ModelSerializer):
+    class Meta:
+       model=TemplateValidationReport
+       fields=(
+           "id",
+           "job",
+           "status",
+           "description",
+           "attempts",
+           "Triggered_At",
+           "variance"
+       )
+    def create(self,validated_data):
+        return TemplateValidationReport.objects.create(**validated_data)
