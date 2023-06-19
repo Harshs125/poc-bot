@@ -1,5 +1,20 @@
 from rest_framework import serializers
-from .models import Configuration, Employee, Schedule, Organization, Department, Jobs,DownloadReport,FileValidationReport,TemplateValidationReport,UploadReport
+from .models import (
+    Configuration,
+    Employee,
+    Schedule,
+    Organization,
+    Department,
+    Jobs,
+    DownloadReport,
+    FileValidationReport,
+    TemplateValidationReport,
+    UploadReport,
+    SignUpInfo,
+    EmpDept,
+    ServiceProvider,
+    
+)
 
 
 class ConfigurationSerializer(serializers.ModelSerializer):
@@ -74,20 +89,30 @@ class EmployeesSerializer(serializers.ModelSerializer):
         return Employee.objects.create(**validated_data)
 
 
-class OragnizationSerializer(serializers.ModelSerializer):
+class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ("id", "name")
+        fields = ("id", "name","department_count","service_providers")
 
     def create(self, validated_data):
         return Organization.objects.create(**validated_data)
 
 
-class DepartmentSerialzer(serializers.ModelSerializer):
+class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ("id", "name", "org")
+        fields = ("id", "name","employee_count", "org")
 
+    def create(self, validated_data):
+        return Department.objects.create(**validated_data)
+
+class ServiceProviderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceProvider
+        fields = ("id", "name", "url")
+        
+    def create(self, validated_data):
+        return ServiceProvider.objects.create(**validated_data)    
 
 class JobsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -105,60 +130,75 @@ class JobsSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Jobs.objects.create(**validated_data)
 
+
 class DownloadSerializer(serializers.ModelSerializer):
     class Meta:
-        model=DownloadReport
-        fields=(
-            "id",
-            "job",
-            "status",
-            "description",
-            "attempts",
-            "Triggered_At"
-        )
-    
-    def create(self,validated_data):
+        model = DownloadReport
+        fields = ("id", "job", "status", "description", "attempts", "Triggered_At")
+
+    def create(self, validated_data):
         return DownloadReport.objects.create(**validated_data)
+
 
 class FileValidatorSerializer(serializers.ModelSerializer):
     class Meta:
-        model=FileValidationReport
-        fields=(
-            "id",
-            "job",
-            "status",
-            "description",
-            "attempts",
-            "Triggered_At"
-        )
-    def create(self,validated_data):
+        model = FileValidationReport
+        fields = ("id", "job", "status", "description", "attempts", "Triggered_At")
+
+    def create(self, validated_data):
         return FileValidationReport.objects.create(**validated_data)
+
 
 class UploadValidatorSerializer(serializers.ModelSerializer):
     class Meta:
-        model=UploadReport
-        fields=(
+        model = UploadReport
+        fields = ("id", "job", "status", "description", "attempts", "Triggered_At")
+
+    def create(self, validated_data):
+        return UploadReport.objects.create(**validated_data)
+
+
+class TemplateValidatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TemplateValidationReport
+        fields = (
             "id",
             "job",
             "status",
             "description",
             "attempts",
-            "Triggered_At"
+            "Triggered_At",
+            "variance",
         )
-    def create(self,validated_data):
-        return UploadReport.objects.create(**validated_data)
-    
-class TemplateValidatorSerializer(serializers.ModelSerializer):
-    class Meta:
-       model=TemplateValidationReport
-       fields=(
-           "id",
-           "job",
-           "status",
-           "description",
-           "attempts",
-           "Triggered_At",
-           "variance"
-       )
-    def create(self,validated_data):
+
+    def create(self, validated_data):
         return TemplateValidationReport.objects.create(**validated_data)
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SignUpInfo
+        fields=(
+            "id",
+            "email",
+            "organization",
+            "designation",
+            "employee_count",
+            "service_providers",
+        )
+        
+        def create(self, validated_data):
+            return SignUpInfo.objects.create(**validated_data)
+        
+        
+class EmpDeptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=EmpDept
+        fields=(
+            "emp",
+            "dept"
+        )
+        
+    def create(self,validated_data):
+        return EmpDept.objects.create(**validated_data)        
+    

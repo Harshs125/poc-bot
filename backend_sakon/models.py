@@ -2,48 +2,52 @@ from django.db import models
 from django.utils import timezone
 
 
-class SuperAdmin(models.Model):
+
+class SignUpInfo(models.Model):
     email = models.EmailField(null=False, unique=True)
-    name = models.CharField(null=False, max_length=250)
-    password = models.CharField(null=False, max_length=250)
+    organization = models.CharField(null=False, max_length=250)
+    designation = models.CharField(null=False, max_length=250)
+    department_count = models.IntegerField(null=False)
+    service_providers = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
 
 
 class Organization(models.Model):
     name = models.CharField(null=False, max_length=250, unique=True)
+    department_count = models.IntegerField(null=False)
+    service_providers = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
 
 
 class Employee(models.Model):
     email = models.EmailField(null=False, unique=True)
     name = models.CharField(null=False, max_length=250)
     password = models.CharField(null=False, max_length=250)
-    type = models.CharField(null=False, max_length=250)
+    EMPLOYEE_TYPE=[
+        ("ADMIN", 1),
+        ("USER", 2),
+        ("SUPERADMIN", 3),
+    ]
+    type = models.CharField(null=False, max_length=20,choices=EMPLOYEE_TYPE)
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
-class Carrier(models.Model):
-    name = models.CharField(max_length=250, null=False, unique=True)
-    website_url = models.URLField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-
-class AdminOrganization(models.Model):
-    admin = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
-    org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        unique_together = ("admin_id", "org_id")
+class ServiceProvider(models.Model):
+    name = models.CharField(null=False, max_length=250)
+    url= models.URLField()
+    
 
 
 class Department(models.Model):
     name = models.CharField(null=False, max_length=250)
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
+    employee_count = models.IntegerField()
 
     class Meta:
         unique_together = ("name", "org_id")
@@ -93,14 +97,6 @@ class Configuration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class FileMetaData(models.Model):
-    name = models.CharField(max_length=250, null=False, unique=True)
-    size = models.IntegerField(null=False)
-    type = models.CharField(max_length=250, null=False)
-    config = models.ForeignKey(Configuration, on_delete=models.CASCADE, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
 
 class Jobs(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True)
@@ -125,58 +121,63 @@ class Jobs(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
     Triggered_At = models.DateTimeField(auto_now_add=True)
 
+
 class DownloadReport(models.Model):
-    job=models.ForeignKey(Jobs,on_delete=models.CASCADE, null=True)
-    STATUS_CHOICES=[
-        ("Progress","Progress"),
-        ("Completed","Completed"),
-        ("Failed","Failed"),
-        ("Pending","Pending")
+    job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    STATUS_CHOICES = [
+        ("Progress", "Progress"),
+        ("Completed", "Completed"),
+        ("Failed", "Failed"),
+        ("Pending", "Pending"),
     ]
-    status=models.CharField(max_length=50,choices=STATUS_CHOICES,default="Progress")
-    description=models.CharField(max_length=1000,default="download is in progress")
-    attempts=models.IntegerField(default=1)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Progress")
+    description = models.CharField(max_length=1000, default="download is in progress")
+    attempts = models.IntegerField(default=1)
     Triggered_At = models.DateTimeField(auto_now_add=True)
 
+
 class FileValidationReport(models.Model):
-    job=models.ForeignKey(Jobs,on_delete=models.CASCADE, null=True)
-    STATUS_CHOICES=[
-        ("Progress","Progress"),
-        ("Completed","Completed"),
-        ("Failed","Failed"),
-        ("Pending","Pending")
+    job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    STATUS_CHOICES = [
+        ("Progress", "Progress"),
+        ("Completed", "Completed"),
+        ("Failed", "Failed"),
+        ("Pending", "Pending"),
     ]
-    status=models.CharField(max_length=50,choices=STATUS_CHOICES,default="Pending")
-    description=models.CharField(max_length=1000,default="File validation is in pending")
-    attempts=models.IntegerField(default=0)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
+    description = models.CharField(
+        max_length=1000, default="File validation is in pending"
+    )
+    attempts = models.IntegerField(default=0)
     Triggered_At = models.DateTimeField(auto_now_add=True)
 
 
 class TemplateValidationReport(models.Model):
-    job=models.ForeignKey(Jobs,on_delete=models.CASCADE, null=True)
-    STATUS_CHOICES=[
-        ("Progress","Progress"),
-        ("Completed","Completed"),
-        ("Failed","Failed"),
-        ("Pending","Pending")
+    job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    STATUS_CHOICES = [
+        ("Progress", "Progress"),
+        ("Completed", "Completed"),
+        ("Failed", "Failed"),
+        ("Pending", "Pending"),
     ]
-    status=models.CharField(max_length=50,choices=STATUS_CHOICES,default="Pending")
-    description=models.CharField(max_length=1000,default="Template validation is in pending")
-    attempts=models.IntegerField(default=0)
-    variance=models.IntegerField(default=0)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
+    description = models.CharField(
+        max_length=1000, default="Template validation is in pending"
+    )
+    attempts = models.IntegerField(default=0)
+    variance = models.IntegerField(default=0)
     Triggered_At = models.DateTimeField(auto_now_add=True)
-    
+
 
 class UploadReport(models.Model):
-    job=models.ForeignKey(Jobs,on_delete=models.CASCADE, null=True)
-    STATUS_CHOICES=[
-        ("Progress","Progress"),
-        ("Completed","Completed"),
-        ("Failed","Failed"),
-        ("Pending","Pending")
+    job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    STATUS_CHOICES = [
+        ("Progress", "Progress"),
+        ("Completed", "Completed"),
+        ("Failed", "Failed"),
+        ("Pending", "Pending"),
     ]
-    status=models.CharField(max_length=50,choices=STATUS_CHOICES,default="Pending")
-    description=models.CharField(max_length=1000,default="Upload is in Pending")
-    attempts=models.IntegerField(default=0)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
+    description = models.CharField(max_length=1000, default="Upload is in Pending")
+    attempts = models.IntegerField(default=0)
     Triggered_At = models.DateTimeField(auto_now_add=True)
-
