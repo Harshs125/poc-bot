@@ -4,10 +4,11 @@ import os, time, imaplib, email, time, requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from .models import Configuration,Department
+from .models import Configuration, Department
 from .filevalidation import file_validation_check
 import requests
 from django.views.decorators.csrf import csrf_exempt
+
 
 def download_file_script(*args):
     for arg in args[0]:
@@ -22,7 +23,7 @@ def download_file_script(*args):
             "department": department_id,
             "organization": org_id,
             "interval": args[2],
-            "emp":args[3]
+            "emp": args[3],
         }
         jobresponse = requests.post(joburl, data=jobdata)
         jobid = jobresponse.json().get("data").get("id")

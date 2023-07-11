@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "backend_sakon",
     "rest_framework_simplejwt",
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [

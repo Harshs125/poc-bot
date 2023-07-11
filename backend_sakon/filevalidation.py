@@ -11,7 +11,7 @@ columns = [
 ]
 
 
-def file_validation_check(filepath, jobid, config_id,sftp_path):
+def file_validation_check(filepath, jobid, config_id, sftp_path):
     response = requests.put(
         f"http://127.0.0.1:8000/jobs/{jobid}",
         data={"service": "File Validation", "status": "Pending"},

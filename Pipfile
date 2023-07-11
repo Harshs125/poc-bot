@@ -11,6 +11,14 @@ tzdata = "==2023.3"
 django-cors-headers = "*"
 djangorestframework = "*"
 black = "*"
+djangorestframework-simplejwt = "*"
+apscheduler = "*"
+pymongo = "*"
+selenium = "*"
+requests = "*"
+pysftp = "*"
+drf-yasg = "*"
+coreapi = "*"
 
 [dev-packages]
 

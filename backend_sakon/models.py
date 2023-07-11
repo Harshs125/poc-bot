@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 
 
-
 class SignUpInfo(models.Model):
     email = models.EmailField(null=False, unique=True)
     organization = models.CharField(null=False, max_length=250)
@@ -13,35 +12,32 @@ class SignUpInfo(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-
-
 class Organization(models.Model):
     name = models.CharField(null=False, max_length=250, unique=True)
     department_count = models.IntegerField(null=False)
     service_providers = models.JSONField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
 
 
 class Employee(models.Model):
     email = models.EmailField(null=False, unique=True)
     name = models.CharField(null=False, max_length=250)
     password = models.CharField(null=False, max_length=250)
-    EMPLOYEE_TYPE=[
+    EMPLOYEE_TYPE = [
         ("ADMIN", 1),
         ("USER", 2),
         ("SUPERADMIN", 3),
     ]
-    type = models.CharField(null=False, max_length=20,choices=EMPLOYEE_TYPE)
+    type = models.CharField(null=False, max_length=20, choices=EMPLOYEE_TYPE)
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
 class ServiceProvider(models.Model):
     name = models.CharField(null=False, max_length=250)
-    url= models.URLField()
-    
+    url = models.URLField()
 
 
 class Department(models.Model):
@@ -81,7 +77,7 @@ class Schedule(models.Model):
 
 class Configuration(models.Model):
     name = models.CharField(null=False, max_length=250, unique=True)
-    department= models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     email = models.EmailField(null=False)
     password = models.CharField(max_length=250, null=False)
     sftp_login = models.CharField(max_length=250, null=False)
@@ -93,7 +89,7 @@ class Configuration(models.Model):
     template = models.FileField(upload_to="files/")
     is_scheduled = models.BooleanField(default=False)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True)
-    org=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -112,8 +108,8 @@ class Jobs(models.Model):
     configuration = models.ForeignKey(
         Configuration, on_delete=models.CASCADE, null=True
     )
-    department = models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
-    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     STATUS_CHOICES = [
         ("Pending", "Pending"),
         ("Failed", "Failed"),
@@ -128,15 +124,15 @@ class Jobs(models.Model):
     service = models.CharField(
         max_length=50, choices=SERVICE_CHOICES, default="Download"
     )
-    emp=models.ForeignKey(Employee,on_delete=models.CASCADE,null=True)
+    emp = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
     Triggered_At = models.DateTimeField(auto_now_add=True)
 
 
 class DownloadReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
-    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
-    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),
@@ -151,8 +147,8 @@ class DownloadReport(models.Model):
 
 class FileValidationReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
-    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
-    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),
@@ -169,8 +165,8 @@ class FileValidationReport(models.Model):
 
 class TemplateValidationReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
-    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
-    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),
@@ -188,8 +184,8 @@ class TemplateValidationReport(models.Model):
 
 class UploadReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
-    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
-    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),

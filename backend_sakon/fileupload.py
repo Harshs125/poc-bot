@@ -31,7 +31,7 @@ def upload_file_to_sftp(filepath, jobid, sftp_path):
             filepath  # Assuming the file is uploaded via a form with a file field
         )
         filename = os.path.basename(local_filepath)
-        # remote_filepath = f"C:/Users/adity/Sakon files/{filename}" 
+        # remote_filepath = f"C:/Users/adity/Sakon files/{filename}"
         # Replace with the remote filepath where you want to store the file on the SFTP server
         remote_filepath = f"{sftp_path}\\{filename}"
         try:
