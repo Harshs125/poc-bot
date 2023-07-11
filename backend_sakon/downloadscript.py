@@ -4,20 +4,25 @@ import os, time, imaplib, email, time, requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from .models import Configuration
+from .models import Configuration,Department
 from .filevalidation import file_validation_check
 import requests
 from django.views.decorators.csrf import csrf_exempt
 
 def download_file_script(*args):
-    print("GEGEGEGEGEGEGE")
     for arg in args[0]:
         config = Configuration.objects.get(id=arg)
+        department = Department.objects.get(id=config.department.id)
+        department_id = department.id
+        org_id = department.org.id
         joburl = "http://127.0.0.1:8000/jobs"
         jobdata = {
             "schedule": args[1],
             "configuration": arg,
-            "department_name": "DE",
+            "department": department_id,
+            "organization": org_id,
+            "interval": args[2],
+            "emp":args[3]
         }
         jobresponse = requests.post(joburl, data=jobdata)
         jobid = jobresponse.json().get("data").get("id")
@@ -25,12 +30,16 @@ def download_file_script(*args):
         filevalidateurl = f"http://127.0.0.1:8000/jobs/report/filevalidation"
         templatevalideurl = f"http://127.0.0.1:8000/jobs/report/templatevalidation"
         uploadurl = f"http://127.0.0.1:8000/jobs/report/upload"
-        reportdata = {"job": jobresponse.json().get("data").get("id")}
+        reportdata = {
+            "job": jobresponse.json().get("data").get("id"),
+            "department": department_id,
+            "organization": org_id,
+            "interval": args[2],
+        }
         downloadresponse = requests.post(downloadurl, data=reportdata)
         filevalidationresponse = requests.post(filevalidateurl, data=reportdata)
         templatevalidationresponse = requests.post(templatevalideurl, data=reportdata)
         uploadresponse = requests.post(uploadurl, data=reportdata)
-
         print("download_file_script started")
 
         chrome_options = Options()
@@ -106,4 +115,4 @@ def download_file_script(*args):
         # Logout from the mail server
         file_path = f"{download_location}\\{filename}"
 
-        file_validation_check(file_path, jobid, arg, config.sftp_path)
+        file_validation_check(file_path, jobid, arg, department)

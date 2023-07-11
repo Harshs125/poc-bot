@@ -18,7 +18,7 @@ class SignUpInfo(models.Model):
 class Organization(models.Model):
     name = models.CharField(null=False, max_length=250, unique=True)
     department_count = models.IntegerField(null=False)
-    service_providers = models.JSONField()
+    service_providers = models.JSONField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -47,7 +47,7 @@ class ServiceProvider(models.Model):
 class Department(models.Model):
     name = models.CharField(null=False, max_length=250)
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
-    employee_count = models.IntegerField()
+    employee_count = models.IntegerField(null=True)
 
     class Meta:
         unique_together = ("name", "org_id")
@@ -81,7 +81,7 @@ class Schedule(models.Model):
 
 class Configuration(models.Model):
     name = models.CharField(null=False, max_length=250, unique=True)
-    dept_name = models.CharField(null=False, max_length=250)
+    department= models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     email = models.EmailField(null=False)
     password = models.CharField(max_length=250, null=False)
     sftp_login = models.CharField(max_length=250, null=False)
@@ -93,9 +93,18 @@ class Configuration(models.Model):
     template = models.FileField(upload_to="files/")
     is_scheduled = models.BooleanField(default=False)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True)
+    org=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+class FileMetaData(models.Model):
+    name = models.CharField(max_length=250, null=False, unique=True)
+    size = models.IntegerField(null=False)
+    type = models.CharField(max_length=250, null=False)
+    config = models.ForeignKey(Configuration, on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Jobs(models.Model):
@@ -103,7 +112,8 @@ class Jobs(models.Model):
     configuration = models.ForeignKey(
         Configuration, on_delete=models.CASCADE, null=True
     )
-    department_name = models.CharField(max_length=250, null=False)
+    department = models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
+    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
     STATUS_CHOICES = [
         ("Pending", "Pending"),
         ("Failed", "Failed"),
@@ -118,12 +128,15 @@ class Jobs(models.Model):
     service = models.CharField(
         max_length=50, choices=SERVICE_CHOICES, default="Download"
     )
+    emp=models.ForeignKey(Employee,on_delete=models.CASCADE,null=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
     Triggered_At = models.DateTimeField(auto_now_add=True)
 
 
 class DownloadReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
+    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),
@@ -138,6 +151,8 @@ class DownloadReport(models.Model):
 
 class FileValidationReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
+    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),
@@ -154,6 +169,8 @@ class FileValidationReport(models.Model):
 
 class TemplateValidationReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
+    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),
@@ -171,6 +188,8 @@ class TemplateValidationReport(models.Model):
 
 class UploadReport(models.Model):
     job = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True)
+    department=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
+    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True)
     STATUS_CHOICES = [
         ("Progress", "Progress"),
         ("Completed", "Completed"),

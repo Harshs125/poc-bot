@@ -10,16 +10,20 @@ urlpatterns = [
         views.OrganizationAPI.as_view(),
         name="add_organization",
     ),
-    path("configurations", views.ConfigurationAPI.as_view(), name="configurations"),
+    path("configurations/get/<int:empid>", views.ConfigurationAPI.as_view(), name="get configurations"),
+    path('configurations/<int:configurationid>', views.ConfigurationAPI.getconfigbyid, name='get-configuration-by-ids'),
     path(
-        "configurations/<int:id>",
+        "configurations",
         views.ConfigurationAPI.as_view(),
-        name="configurations_update",
+        name="create configuration",
     ),
-    path("schedules", views.ScheduleAPI.as_view(), name="schedules"),
-    path("schedules/<int:id>", views.ScheduleAPI.as_view(), name="schedules_update"),
+    path("schedules/get/<int:empid>", views.ScheduleAPI.as_view(), name="get schedules"),
+    path("schedules", views.ScheduleAPI.as_view(), name="create schedules"),
+    path("schedules/<int:scheduleid>", views.ScheduleAPI.as_view(), name="schedules_update"),
     path("departments", views.DepartmentAPI.as_view(), name="departments"),
+    path("departments/<int:id>", views.DepartmentAPI.as_view(), name="update_department"),
     path("jobs", views.JobsAPI.as_view(), name="Jobs"),
+    path("jobs/get/<int:empid>", views.JobsAPI.as_view(), name="get Jobs"),
     path("jobs/<int:id>", views.JobsAPI.as_view(), name="Jobs update"),
     path(
         "jobs/report/download/<int:jobid>",
@@ -66,6 +70,15 @@ urlpatterns = [
     path("add_to_queue/<int:id>", views.add_schedule_to_queue, name="add_to_queue"),
     
     path("signup", views.SignupAPI.as_view(), name="signup"),
+    path("signup/<int:id>", views.SignupAPI.as_view(), name="update_signup"),
 
     path("serviceprovider", views.ServiceProviderAPI.as_view(), name="serviceprovider"),
+    path("serviceprovider/<int:id>", views.ServiceProviderAPI.as_view(), name="update_serviceprovider"),
+    
+    path("login", views.LoginApi.as_view(), name="login api"),
+    path("refresh", views.RefreshApi.as_view(), name="refresh api"),
+    path("dashboard/graph", views.ChartGraphAPI.as_view(), name="Graph api"),
+
+
+    
 ]
